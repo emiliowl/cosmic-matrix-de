@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Matrix Cursor Size: set cursor size to s=24 / m=48 / l=64
-# Usage: ./setup-matrix-cursor-size.sh <s|m|l> [--logout]
+# Usage: ./setup-matrix-cursor-size.sh <s|m|l|xl> [--logout]
 #   --logout  apply configs then immediately log out so COSMIC picks them up
 
 GREEN='\033[0;32m'
@@ -16,11 +16,11 @@ SIZE_ARG=""
 
 for arg in "$@"; do
   case "$arg" in
-    --logout) LOGOUT=1 ;;
-    s|m|l)    SIZE_ARG="$arg" ;;
+    --logout)  LOGOUT=1 ;;
+    s|m|l|xl)  SIZE_ARG="$arg" ;;
     *)
-      echo -e "${BRIGHT_GREEN}Usage:${NC} $0 <s|m|l> [--logout]"
-      echo -e "  s = 24   m = 48   l = 64"
+      echo -e "${BRIGHT_GREEN}Usage:${NC} $0 <s|m|l|xl> [--logout]"
+      echo -e "  s = 24   m = 36   l = 48   xl = 64"
       echo -e "  --logout  log out immediately after applying"
       exit 1
       ;;
@@ -28,15 +28,16 @@ for arg in "$@"; do
 done
 
 if [ -z "$SIZE_ARG" ]; then
-  echo -e "${BRIGHT_GREEN}Usage:${NC} $0 <s|m|l> [--logout]"
-  echo -e "  s = 24   m = 48   l = 64"
+  echo -e "${BRIGHT_GREEN}Usage:${NC} $0 <s|m|l|xl> [--logout]"
+  echo -e "  s = 24   m = 36   l = 48   xl = 64"
   exit 1
 fi
 
 case "$SIZE_ARG" in
-  s) CURSOR_SIZE=24 ;;
-  m) CURSOR_SIZE=48 ;;
-  l) CURSOR_SIZE=64 ;;
+  s)  CURSOR_SIZE=24 ;;
+  m)  CURSOR_SIZE=36 ;;
+  l)  CURSOR_SIZE=48 ;;
+  xl) CURSOR_SIZE=64 ;;
 esac
 
 CURSOR_THEME="Vimix-green-cursors"
