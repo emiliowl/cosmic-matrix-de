@@ -125,14 +125,27 @@ set_ini_key "$GTK4" "gtk-cursor-theme-name" "$CURSOR_THEME"
 set_ini_key "$GTK4" "gtk-cursor-theme-size" "$CURSOR_SIZE"
 log_done "GTK4: $CURSOR_THEME @ $CURSOR_SIZE"
 
-# ─── 5. Systemd user environment ──────────────────────────────────────────────
-log "Writing systemd user environment..."
+# ─── 5. Environment — both systemd-user and PAM (for cosmic-comp) ────────────
+log "Writing cursor environment..."
 mkdir -p "$HOME/.config/environment.d"
 cat > "$HOME/.config/environment.d/cursor.conf" << EOF
 XCURSOR_THEME=$CURSOR_THEME
 XCURSOR_SIZE=$CURSOR_SIZE
 EOF
 log_done "environment.d/cursor.conf written"
+
+# /etc/environment is read by PAM and injected into ALL processes at login,
+# including cosmic-session and cosmic-comp. This is what actually controls
+# the cursor size in COSMIC DE.
+for key_val in "XCURSOR_THEME=$CURSOR_THEME" "XCURSOR_SIZE=$CURSOR_SIZE"; do
+  key="${key_val%%=*}"
+  if grep -q "^${key}=" /etc/environment 2>/dev/null; then
+    sudo sed -i "s|^${key}=.*|${key_val}|" /etc/environment
+  else
+    echo "$key_val" | sudo tee -a /etc/environment > /dev/null
+  fi
+done
+log_done "/etc/environment updated"
 
 # ─── 6. COSMIC DE ─────────────────────────────────────────────────────────────
 log "Configuring COSMIC DE cursor..."
