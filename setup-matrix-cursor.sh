@@ -27,7 +27,7 @@ else
 
   # Build deps
   log "Installing build dependencies..."
-  sudo apt-get install -y -qq xcursorgen python3-cairosvg
+  sudo apt-get install -y -qq x11-apps python3-cairosvg
   log_done "Build deps ready"
 
   TMPDIR_BUILD="$(mktemp -d)"
