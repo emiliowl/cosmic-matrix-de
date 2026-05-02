@@ -27,7 +27,7 @@ else
 
   # Build deps
   log "Installing build dependencies..."
-  sudo apt-get install -y -qq x11-apps python3-cairosvg
+  sudo apt-get install -y -qq x11-apps librsvg2-bin
   log_done "Build deps ready"
 
   TMPDIR_BUILD="$(mktemp -d)"
@@ -53,10 +53,10 @@ else
   mkdir -p "$SRC/x1" "$SRC/x1_25" "$SRC/x1_5" "$SRC/x2"
   find "$SRC/svg-green/" -name "*.svg" -type f | while read -r svg; do
     base="$(basename "${svg%.svg}")"
-    python3 -c "import cairosvg; cairosvg.svg2png(url='$svg', write_to='$SRC/x1/${base}.png',    output_width=32,  output_height=32)"
-    python3 -c "import cairosvg; cairosvg.svg2png(url='$svg', write_to='$SRC/x1_25/${base}.png', output_width=40,  output_height=40)"
-    python3 -c "import cairosvg; cairosvg.svg2png(url='$svg', write_to='$SRC/x1_5/${base}.png',  output_width=48,  output_height=48)"
-    python3 -c "import cairosvg; cairosvg.svg2png(url='$svg', write_to='$SRC/x2/${base}.png',    output_width=64,  output_height=64)"
+    rsvg-convert -w 32 -h 32 -o "$SRC/x1/${base}.png"    "$svg"
+    rsvg-convert -w 40 -h 40 -o "$SRC/x1_25/${base}.png" "$svg"
+    rsvg-convert -w 48 -h 48 -o "$SRC/x1_5/${base}.png"  "$svg"
+    rsvg-convert -w 64 -h 64 -o "$SRC/x2/${base}.png"    "$svg"
   done
   log_done "PNGs rendered"
 
