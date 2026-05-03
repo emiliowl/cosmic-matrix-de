@@ -61,7 +61,22 @@ write_ron "$BG_DIR/all" "(
 write_ron "$BG_DIR/same-on-all" "true"
 log_done "Background config written"
 
-# ─── 2. Matrix green accent + sharp corners ───────────────────────────────────
+# ─── 2. Compiled theme (CosmicTheme.Dark/v1) ─────────────────────────────────
+# COSMIC apps read the compiled theme directly — not the Builder files.
+# Without this, icons/text stay white until the user opens Settings and triggers
+# a recompile manually. We ship the pre-compiled output so it's green on first login.
+log "Installing compiled Matrix theme..."
+COMPILED_SRC="$SCRIPT_DIR/themes/cosmic-matrix-dark"
+COMPILED_DEST="$COSMIC_CFG/com.system76.CosmicTheme.Dark/v1"
+if [ -d "$COMPILED_SRC" ]; then
+  mkdir -p "$COMPILED_DEST"
+  cp "$COMPILED_SRC"/* "$COMPILED_DEST/"
+  log_done "Compiled theme installed ($(ls "$COMPILED_SRC" | wc -l) files)"
+else
+  log_warn "themes/cosmic-matrix-dark not found in repo — icons may be white until Settings is opened"
+fi
+
+# ─── 3. Theme builder (Dark.Builder/v1) ──────────────────────────────────────
 log "Applying matrix green accent and theme builder settings..."
 BUILDER_DIR="$COSMIC_CFG/com.system76.CosmicTheme.Dark.Builder/v1"
 mkdir -p "$BUILDER_DIR"
@@ -117,7 +132,7 @@ write_ron "$BUILDER_DIR/active_hint" "2"
 
 log_done "Theme builder written (accent #00FF41, fully sharp, green-tinted bg)"
 
-# ─── 3. Cosmic Terminal ───────────────────────────────────────────────────────
+# ─── 4. Cosmic Terminal ───────────────────────────────────────────────────────
 log "Configuring Cosmic Terminal..."
 TERM_DIR="$COSMIC_CFG/com.system76.CosmicTerm/v1"
 mkdir -p "$TERM_DIR"
@@ -130,7 +145,7 @@ write_ron "$TERM_DIR/show_headerbar" "true"
 write_ron "$TERM_DIR/use_bright_bold" "true"
 log_done "Cosmic Terminal: JetBrainsMono Nerd Font Mono 16, dark, 80% opacity"
 
-# ─── 4. System fonts + toolkit settings ──────────────────────────────────────
+# ─── 5. System fonts + toolkit settings ──────────────────────────────────────
 log "Setting system fonts and toolkit settings..."
 TK_DIR="$COSMIC_CFG/com.system76.CosmicTk/v1"
 mkdir -p "$TK_DIR"
@@ -152,7 +167,7 @@ write_ron "$TK_DIR/interface_density" "Standard"
 write_ron "$TK_DIR/header_size" "Standard"
 log_done "Fonts: JetBrainsMono Nerd Font (mono), JetBrainsMonoNL Nerd Font (UI)"
 
-# ─── 5. Compositor settings ───────────────────────────────────────────────────
+# ─── 6. Compositor settings ───────────────────────────────────────────────────
 log "Configuring compositor..."
 COMP_DIR="$COSMIC_CFG/com.system76.CosmicComp/v1"
 mkdir -p "$COMP_DIR"
@@ -161,7 +176,7 @@ write_ron "$COMP_DIR/autotile_behavior" "PerWorkspace"
 write_ron "$COMP_DIR/active_hint" "false"
 log_done "Autotile (PerWorkspace), active_hint off"
 
-# ─── 6. Panel ─────────────────────────────────────────────────────────────────
+# ─── 7. Panel ─────────────────────────────────────────────────────────────────
 log "Configuring top panel..."
 PANEL_DIR="$COSMIC_CFG/com.system76.CosmicPanel.Panel/v1"
 mkdir -p "$PANEL_DIR"
@@ -202,7 +217,7 @@ write_ron "$PANEL_DIR/plugins_wings" 'Some(([
 ]))'
 log_done "Panel: XS, 0.55 opacity, ThemeDefault, floating, full-width"
 
-# ─── 7. Dock ──────────────────────────────────────────────────────────────────
+# ─── 8. Dock ──────────────────────────────────────────────────────────────────
 log "Configuring dock..."
 DOCK_DIR="$COSMIC_CFG/com.system76.CosmicPanel.Dock/v1"
 mkdir -p "$DOCK_DIR"
@@ -233,7 +248,7 @@ write_ron "$DOCK_DIR/plugins_center" 'Some([
 write_ron "$DOCK_DIR/plugins_wings"        "None"
 log_done "Dock: M, 0.6 opacity, Dark bg, floating, bottom"
 
-# ─── 8. Panel registry ────────────────────────────────────────────────────────
+# ─── 9. Panel registry ────────────────────────────────────────────────────────
 PANEL_REGISTRY="$COSMIC_CFG/com.system76.CosmicPanel/v1"
 mkdir -p "$PANEL_REGISTRY"
 write_ron "$PANEL_REGISTRY/entries" '[
