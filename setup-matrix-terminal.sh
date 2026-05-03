@@ -164,9 +164,11 @@ bindkey '^[[A' history-substring-search-up
 bindkey '^[[B' history-substring-search-down
 
 # ── Useful aliases ─────────────────────────────────────────────
-alias ll='ls -lAh --color=auto'
-alias la='ls -A --color=auto'
-alias l='ls -CF --color=auto'
+alias ls='eza --icons --group-directories-first'
+alias ll='eza -lAh --icons --group-directories-first --git'
+alias la='eza -A --icons --group-directories-first'
+alias l='eza --icons --group-directories-first'
+alias lt='eza --icons --tree --level=2'
 alias grep='grep --color=auto'
 alias diff='diff --color=auto'
 alias ip='ip --color=auto'
@@ -375,7 +377,16 @@ cat > "$HOME/.p10k.zsh" << 'P10K'
 P10K
 log_done ".p10k.zsh written (Matrix theme)"
 
-# ─── 8. Set zsh as default shell ─────────────────────────────────────────────
+# ─── 8. Install eza (modern ls with icons) ───────────────────────────────────
+log "Installing eza..."
+if ! command -v eza &>/dev/null; then
+  sudo apt-get install -y -qq eza
+  log_done "eza installed: $(eza --version | head -1)"
+else
+  log_done "eza already installed, skipping"
+fi
+
+# ─── 9. Set zsh as default shell ─────────────────────────────────────────────
 log "Setting zsh as default shell..."
 ZSH_PATH="$(which zsh)"
 if [ "$SHELL" != "$ZSH_PATH" ]; then
@@ -385,10 +396,11 @@ else
   log_done "zsh is already the default shell"
 fi
 
+
 # ─── Done ─────────────────────────────────────────────────────────────────────
 echo ""
 echo -e "${BRIGHT_GREEN}╔══════════════════════════════════════════════════╗${NC}"
-echo -e "${BRIGHT_GREEN}║  Matrix terminal setup complete.                 ║${NC}"
+echo -e "${BRIGHT_GREEN}║  Matrix terminal setup complete.                  ║${NC}"
 echo -e "${BRIGHT_GREEN}║                                                  ║${NC}"
 echo -e "${BRIGHT_GREEN}║  Next steps:                                     ║${NC}"
 echo -e "${BRIGHT_GREEN}║  1. Set terminal font to: MesloLGS NF            ║${NC}"
