@@ -56,26 +56,21 @@ clone_if_missing zsh-syntax-highlighting https://github.com/zsh-users/zsh-syntax
 clone_if_missing zsh-completions       https://github.com/zsh-users/zsh-completions
 clone_if_missing zsh-history-substring-search https://github.com/zsh-users/zsh-history-substring-search
 
-# ─── 5. Install MesloLGS Nerd Font (p10k recommended) ────────────────────────
-log "Installing MesloLGS NF (Nerd Font for p10k)..."
-FONT_DIR="$HOME/.local/share/fonts/MesloLGS-NF"
-mkdir -p "$FONT_DIR"
-
-BASE_URL="https://github.com/romkatv/powerlevel10k-media/raw/master"
-FONTS=(
-  "MesloLGS%20NF%20Regular.ttf"
-  "MesloLGS%20NF%20Bold.ttf"
-  "MesloLGS%20NF%20Italic.ttf"
-  "MesloLGS%20NF%20Bold%20Italic.ttf"
-)
-for font in "${FONTS[@]}"; do
-  fname="${font//%20/ }"
-  if [ ! -f "$FONT_DIR/$fname" ]; then
-    wget -q -O "$FONT_DIR/$fname" "$BASE_URL/$font"
-  fi
-done
-fc-cache -f "$FONT_DIR"
-log_done "MesloLGS NF installed to $FONT_DIR"
+# ─── 5. Install JetBrainsMono Nerd Font ──────────────────────────────────────
+log "Installing JetBrainsMono Nerd Font..."
+FONT_DIR="$HOME/.local/share/fonts/JetBrainsMonoNerd"
+if [ -d "$FONT_DIR" ] && [ -n "$(ls -A "$FONT_DIR" 2>/dev/null)" ]; then
+  log_done "JetBrainsMono Nerd Font already present, skipping"
+else
+  mkdir -p "$FONT_DIR"
+  TMPZIP="$(mktemp --suffix=.zip)"
+  wget -q --show-progress -O "$TMPZIP" \
+    "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.zip"
+  unzip -q -o "$TMPZIP" -d "$FONT_DIR"
+  rm -f "$TMPZIP"
+  fc-cache -f "$FONT_DIR"
+  log_done "JetBrainsMono Nerd Font installed to $FONT_DIR"
+fi
 
 # ─── 6. Write .zshrc ──────────────────────────────────────────────────────────
 log "Writing ~/.zshrc..."
@@ -204,6 +199,7 @@ log_done ".zshrc written"
 log "Writing ~/.p10k.zsh (Matrix theme)..."
 cat > "$HOME/.p10k.zsh" << 'P10K'
 # Powerlevel10k — Matrix Edition
+# Font:   JetBrainsMono Nerd Font (any Nerd Font variant works)
 # Colors: #00FF41 (matrix green), #003B00 (dark green), #000000 (void black)
 
 'builtin' 'local' '-a' 'p10k_config_opts'
@@ -391,7 +387,7 @@ echo -e "${BRIGHT_GREEN}╔═════════════════�
 echo -e "${BRIGHT_GREEN}║  Matrix terminal setup complete.                 ║${NC}"
 echo -e "${BRIGHT_GREEN}║                                                  ║${NC}"
 echo -e "${BRIGHT_GREEN}║  Next steps:                                     ║${NC}"
-echo -e "${BRIGHT_GREEN}║  1. Set terminal font to: MesloLGS NF            ║${NC}"
+echo -e "${BRIGHT_GREEN}║  1. Set terminal font to: JetBrainsMono NF       ║${NC}"
 echo -e "${BRIGHT_GREEN}║  2. Set terminal background: #0D0D0D             ║${NC}"
 echo -e "${BRIGHT_GREEN}║  3. Set terminal foreground: #00FF41             ║${NC}"
 echo -e "${BRIGHT_GREEN}║  4. Log out and back in (or run: exec zsh)       ║${NC}"
