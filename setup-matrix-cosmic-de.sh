@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Matrix Cosmic DE visual setup
 # Writes: wallpaper, matrix-green accent, sharp corners, green-tinted bg,
-#         frosted panels, terminal + UI fonts, toolkit settings, autotile
+#         frosted panels, terminal + UI fonts, toolkit settings,
+#         panel + dock layout, autotile, compositor tweaks
 
 set -e
 
@@ -126,6 +127,7 @@ write_ron "$TERM_DIR/app_theme" "Dark"
 write_ron "$TERM_DIR/syntax_theme_dark" "\"COSMIC Dark\""
 write_ron "$TERM_DIR/opacity" "80"
 write_ron "$TERM_DIR/show_headerbar" "true"
+write_ron "$TERM_DIR/use_bright_bold" "true"
 log_done "Cosmic Terminal: JetBrainsMono Nerd Font Mono 16, dark, 80% opacity"
 
 # ─── 4. System fonts + toolkit settings ──────────────────────────────────────
@@ -150,13 +152,95 @@ write_ron "$TK_DIR/interface_density" "Standard"
 write_ron "$TK_DIR/header_size" "Standard"
 log_done "Fonts: JetBrainsMono Nerd Font (mono), JetBrainsMonoNL Nerd Font (UI)"
 
-# ─── 5. Autotile ──────────────────────────────────────────────────────────────
-log "Enabling autotile..."
+# ─── 5. Compositor settings ───────────────────────────────────────────────────
+log "Configuring compositor..."
 COMP_DIR="$COSMIC_CFG/com.system76.CosmicComp/v1"
 mkdir -p "$COMP_DIR"
 write_ron "$COMP_DIR/autotile" "true"
 write_ron "$COMP_DIR/autotile_behavior" "PerWorkspace"
-log_done "Autotile enabled (PerWorkspace)"
+write_ron "$COMP_DIR/active_hint" "false"
+log_done "Autotile (PerWorkspace), active_hint off"
+
+# ─── 6. Panel ─────────────────────────────────────────────────────────────────
+log "Configuring top panel..."
+PANEL_DIR="$COSMIC_CFG/com.system76.CosmicPanel.Panel/v1"
+mkdir -p "$PANEL_DIR"
+write_ron "$PANEL_DIR/anchor"               "Top"
+write_ron "$PANEL_DIR/anchor_gap"           "true"
+write_ron "$PANEL_DIR/autohide"             "None"
+write_ron "$PANEL_DIR/autohover_delay_ms"   "Some(500)"
+write_ron "$PANEL_DIR/background"           "ThemeDefault"
+write_ron "$PANEL_DIR/border_radius"        "0"
+write_ron "$PANEL_DIR/exclusive_zone"       "true"
+write_ron "$PANEL_DIR/expand_to_edges"      "true"
+write_ron "$PANEL_DIR/keyboard_interactivity" "OnDemand"
+write_ron "$PANEL_DIR/layer"                "Top"
+write_ron "$PANEL_DIR/margin"               "4"
+write_ron "$PANEL_DIR/name"                 '"Panel"'
+write_ron "$PANEL_DIR/opacity"              "0.55"
+write_ron "$PANEL_DIR/output"               "All"
+write_ron "$PANEL_DIR/padding"              "0"
+write_ron "$PANEL_DIR/padding_overlap"      "0.5"
+write_ron "$PANEL_DIR/size"                 "XS"
+write_ron "$PANEL_DIR/size_center"          "None"
+write_ron "$PANEL_DIR/size_wings"           "None"
+write_ron "$PANEL_DIR/spacing"              "0"
+write_ron "$PANEL_DIR/plugins_center" 'Some([
+    "com.system76.CosmicAppletTime",
+])'
+write_ron "$PANEL_DIR/plugins_wings" 'Some(([
+    "com.system76.CosmicPanelWorkspacesButton",
+    "com.system76.CosmicPanelAppButton",
+], [
+    "com.system76.CosmicAppletStatusArea",
+    "com.system76.CosmicAppletTiling",
+    "com.system76.CosmicAppletNetwork",
+    "com.system76.CosmicAppletAudio",
+    "com.system76.CosmicAppletBattery",
+    "com.system76.CosmicAppletNotifications",
+    "com.system76.CosmicAppletPower",
+]))'
+log_done "Panel: XS, 0.55 opacity, ThemeDefault, floating, full-width"
+
+# ─── 7. Dock ──────────────────────────────────────────────────────────────────
+log "Configuring dock..."
+DOCK_DIR="$COSMIC_CFG/com.system76.CosmicPanel.Dock/v1"
+mkdir -p "$DOCK_DIR"
+write_ron "$DOCK_DIR/anchor"               "Bottom"
+write_ron "$DOCK_DIR/anchor_gap"           "true"
+write_ron "$DOCK_DIR/autohide"             "None"
+write_ron "$DOCK_DIR/autohover_delay_ms"   "Some(500)"
+write_ron "$DOCK_DIR/background"           "Dark"
+write_ron "$DOCK_DIR/border_radius"        "0"
+write_ron "$DOCK_DIR/exclusive_zone"       "true"
+write_ron "$DOCK_DIR/expand_to_edges"      "false"
+write_ron "$DOCK_DIR/keyboard_interactivity" "OnDemand"
+write_ron "$DOCK_DIR/layer"                "Top"
+write_ron "$DOCK_DIR/margin"               "2"
+write_ron "$DOCK_DIR/name"                 '"Dock"'
+write_ron "$DOCK_DIR/opacity"              "0.6"
+write_ron "$DOCK_DIR/output"               "All"
+write_ron "$DOCK_DIR/padding"              "2"
+write_ron "$DOCK_DIR/padding_overlap"      "0.5"
+write_ron "$DOCK_DIR/size"                 "M"
+write_ron "$DOCK_DIR/size_center"          "None"
+write_ron "$DOCK_DIR/size_wings"           "None"
+write_ron "$DOCK_DIR/spacing"              "0"
+write_ron "$DOCK_DIR/plugins_center" 'Some([
+    "com.system76.CosmicPanelLauncherButton",
+    "com.system76.CosmicAppList",
+])'
+write_ron "$DOCK_DIR/plugins_wings"        "None"
+log_done "Dock: M, 0.6 opacity, Dark bg, floating, bottom"
+
+# ─── 8. Panel registry ────────────────────────────────────────────────────────
+PANEL_REGISTRY="$COSMIC_CFG/com.system76.CosmicPanel/v1"
+mkdir -p "$PANEL_REGISTRY"
+write_ron "$PANEL_REGISTRY/entries" '[
+    "Panel",
+    "Dock",
+]'
+log_done "Panel registry: Panel + Dock"
 
 # ─── Done ─────────────────────────────────────────────────────────────────────
 echo ""
