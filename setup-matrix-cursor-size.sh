@@ -40,9 +40,18 @@ case "$SIZE_ARG" in
   xl) CURSOR_SIZE=64 ;;
 esac
 
-CURSOR_THEME="Vimix-green-cursors"
+# Detect active theme from COSMIC config, fall back to GTK3
+COSMIC_COMP="$HOME/.config/cosmic/com.system76.CosmicComp/v1"
+if [ -f "$COSMIC_COMP/cursor_theme" ]; then
+  CURSOR_THEME="$(sed 's/"//g' "$COSMIC_COMP/cursor_theme")"
+elif grep -q '^gtk-cursor-theme-name=' "$HOME/.config/gtk-3.0/settings.ini" 2>/dev/null; then
+  CURSOR_THEME="$(grep '^gtk-cursor-theme-name=' "$HOME/.config/gtk-3.0/settings.ini" | cut -d= -f2)"
+else
+  log_warn "Could not detect active cursor theme — run setup-matrix-cursor.sh first"
+  exit 1
+fi
 
-log "Setting cursor size to ${CURSOR_SIZE}px ($SIZE_ARG)..."
+log "Setting cursor size to ${CURSOR_SIZE}px ($SIZE_ARG) for theme: $CURSOR_THEME..."
 
 set_ini_key() {
   local file="$1" key="$2" val="$3"
@@ -95,7 +104,6 @@ fi
 log_done "~/.Xresources updated"
 
 # ─── COSMIC DE ────────────────────────────────────────────────────────────────
-COSMIC_COMP="$HOME/.config/cosmic/com.system76.CosmicComp/v1"
 mkdir -p "$COSMIC_COMP"
 printf '%s' "$CURSOR_SIZE"          > "$COSMIC_COMP/cursor_size"
 printf '"%s"' "$CURSOR_THEME"       > "$COSMIC_COMP/cursor_theme"
