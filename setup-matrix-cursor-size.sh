@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Matrix Cursor Size: set cursor size to s=24 / m=48 / l=64
+# Matrix Cursor Size: set cursor size to s=32 / m=40 / l=48 / xl=64
 # Usage: ./setup-matrix-cursor-size.sh <s|m|l|xl> [--logout]
 #   --logout  apply configs then immediately log out so COSMIC picks them up
 
@@ -20,7 +20,7 @@ for arg in "$@"; do
     s|m|l|xl)  SIZE_ARG="$arg" ;;
     *)
       echo -e "${BRIGHT_GREEN}Usage:${NC} $0 <s|m|l|xl> [--logout]"
-      echo -e "  s = 24   m = 36   l = 48   xl = 64"
+      echo -e "  s = 32   m = 40   l = 48   xl = 64"
       echo -e "  --logout  log out immediately after applying"
       exit 1
       ;;
@@ -29,13 +29,13 @@ done
 
 if [ -z "$SIZE_ARG" ]; then
   echo -e "${BRIGHT_GREEN}Usage:${NC} $0 <s|m|l|xl> [--logout]"
-  echo -e "  s = 24   m = 36   l = 48   xl = 64"
+  echo -e "  s = 32   m = 40   l = 48   xl = 64"
   exit 1
 fi
 
 case "$SIZE_ARG" in
-  s)  CURSOR_SIZE=24 ;;
-  m)  CURSOR_SIZE=36 ;;
+  s)  CURSOR_SIZE=32 ;;
+  m)  CURSOR_SIZE=40 ;;
   l)  CURSOR_SIZE=48 ;;
   xl) CURSOR_SIZE=64 ;;
 esac
@@ -92,7 +92,12 @@ if grep -q "^XCURSOR_SIZE=" /etc/environment 2>/dev/null; then
 else
   echo "XCURSOR_SIZE=$CURSOR_SIZE" | sudo tee -a /etc/environment > /dev/null
 fi
-log_done "/etc/environment updated (XCURSOR_SIZE=$CURSOR_SIZE)"
+if grep -q "^XCURSOR_THEME=" /etc/environment 2>/dev/null; then
+  sudo sed -i "s|^XCURSOR_THEME=.*|XCURSOR_THEME=$CURSOR_THEME|" /etc/environment
+else
+  echo "XCURSOR_THEME=$CURSOR_THEME" | sudo tee -a /etc/environment > /dev/null
+fi
+log_done "/etc/environment updated (XCURSOR_SIZE=$CURSOR_SIZE XCURSOR_THEME=$CURSOR_THEME)"
 
 # ─── Xresources ───────────────────────────────────────────────────────────────
 touch "$HOME/.Xresources"
